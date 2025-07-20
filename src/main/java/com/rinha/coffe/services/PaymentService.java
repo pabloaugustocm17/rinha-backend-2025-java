@@ -1,10 +1,12 @@
 package com.rinha.coffe.services;
 
+import com.rinha.coffe.events.dtos.PaymentRequestEvent;
 import com.rinha.coffe.integrations.PaymentProcessorIntegration;
 import com.rinha.coffe.models.Payment;
 import com.rinha.coffe.models.dtos.PaymentCreateDTO;
 import com.rinha.coffe.models.dtos.PaymentGetDTO;
 import com.rinha.coffe.repositories.PaymentRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,8 +21,11 @@ public class PaymentService {
 
     private final PaymentRepository PAYMENT_REPOSITORY;
 
-    public PaymentService(PaymentRepository paymentRepository) {
+    private final ApplicationEventPublisher PUBLISHER;
+
+    public PaymentService(PaymentRepository paymentRepository, ApplicationEventPublisher publisher) {
         this.PAYMENT_REPOSITORY = paymentRepository;
+        this.PUBLISHER = publisher;
     }
 
     @Transactional
@@ -41,6 +46,13 @@ public class PaymentService {
         doAsync(dto);
     }
 
+    public void createPaymentEvent(PaymentCreateDTO dto){
+
+        Payment payment = new Payment(dto);
+
+        PUBLISHER.publishEvent(new PaymentRequestEvent(payment));
+    }
+
     @Transactional
     @Async
     protected CompletableFuture<Void> doAsync(PaymentCreateDTO dto){
@@ -48,7 +60,7 @@ public class PaymentService {
         Payment payment = new Payment(dto);
 
         int path = PaymentProcessorIntegration.doPostPayment(
-                payment.createSendDto()
+            payment.createSendDto()
         );
 
         payment.setSource(path);

@@ -26,9 +26,14 @@ public class PaymentController {
         @RequestBody PaymentCreateDTO dto
     ){
 
+        //V1 - Síncrono
         //PAYMENT_SERVICE.createPaymentSync(dto);
 
-        PAYMENT_SERVICE.createPaymentAsync(dto);
+        //V2 - Assíncrono
+        //PAYMENT_SERVICE.createPaymentAsync(dto);
+
+        //V3 - Eventos
+        PAYMENT_SERVICE.createPaymentEvent(dto);
 
         return ResponseEntity.status(201).build();
     }
@@ -45,3 +50,6 @@ public class PaymentController {
     }
 
 }
+
+//$Env:K6_WEB_DASHBOARD = 'true'; $Env:K6_WEB_DASHBOARD_EXPORT = 'html-report.html'; k6 run rinha.js
+//set K6_WEB_DASHBOARD = 'true' set K6_WEB_DASHBOARD_EXPORT = 'html-report.html' k6 run rinha.js

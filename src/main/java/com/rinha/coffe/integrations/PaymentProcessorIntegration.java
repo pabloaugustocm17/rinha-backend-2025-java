@@ -21,14 +21,14 @@ public class PaymentProcessorIntegration {
 
         String url_2 = "http://localhost:8002/payments";
 
-        LOG.info(">> POST /payments: {} - {} ", url, dto);
+        //LOG.info(">> POST /payments: {} - {} ", url, dto);
 
         int status_code = doPost(dto, url);
 
-        LOG.info(">> Recieve: {} ", status_code);
+        //LOG.info(">> Recieve: {} ", status_code);
 
         if(status_code == -1){
-            LOG.info(">> POST /payments: {} - {} ", url_2, dto);
+            //LOG.info(">> POST /payments: {} - {} ", url_2, dto);
             doPost(dto, url_2);
             return 2;
         }
